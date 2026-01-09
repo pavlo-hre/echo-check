@@ -18,6 +18,7 @@ export default function Home() {
   const [responseData, setResponseData] = useState<{
     name: string;
     taxNumber: string,
+    date: string,
   }[]>([]);
   const ref = useRef<any>(null);
   const loadedAtRef = useRef<number>(0);
@@ -35,6 +36,7 @@ export default function Home() {
       const resFiltered = res.data.values.filter((el: any) => !!el.length).map((item: any) => ({
         name: `${item?.at(0)} ${item?.at(1)} ${item?.at(2)}`,
         taxNumber: item?.at(4),
+        date: item?.at(5),
       })) || [];
       setFetching(false);
       setResponseData(resFiltered);
@@ -126,11 +128,12 @@ export default function Home() {
     if (!list || list.length === 0) return;
 
     const rows = list.map((r) => ({
+      Дата: r.date || '',
       Бенефіціар: r.name || '',
       ІПН: r.taxNumber || '',
     }));
 
-    const ws = XLSX.utils.json_to_sheet(rows, {header: ['Бенефіціар', 'ІПН', ]});
+    const ws = XLSX.utils.json_to_sheet(rows, {header: ['Дата', 'Бенефіціар', 'ІПН']});
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Results');
 
@@ -184,7 +187,10 @@ export default function Home() {
           list?.map((el, index: number) => (
             <div className="mb-2 border-b-2 border-gray-300 p-3" key={`${index}_${el.taxNumber}`}>
               <div>{el.name}</div>
-              <div>{el.taxNumber}</div>
+              <div className="flex justify-between">
+                <div>{el.taxNumber}</div>
+                <div>{el.date}</div>
+              </div>
             </div>
           ))
         }
